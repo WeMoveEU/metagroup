@@ -1,15 +1,15 @@
 <?php
 
-require_once 'metagroup.civix.php';
-use CRM_Metagroup_ExtensionUtil as E;
+require_once 'metasearch.civix.php';
+use CRM_Metasearch_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function metagroup_civicrm_config(&$config) {
-  _metagroup_civix_civicrm_config($config);
+function metasearch_civicrm_config(&$config) {
+  _metasearch_civix_civicrm_config($config);
 }
 
 /**
@@ -17,8 +17,8 @@ function metagroup_civicrm_config(&$config) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
-function metagroup_civicrm_xmlMenu(&$files) {
-  _metagroup_civix_civicrm_xmlMenu($files);
+function metasearch_civicrm_xmlMenu(&$files) {
+  _metasearch_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -26,8 +26,8 @@ function metagroup_civicrm_xmlMenu(&$files) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
-function metagroup_civicrm_install() {
-  _metagroup_civix_civicrm_install();
+function metasearch_civicrm_install() {
+  _metasearch_civix_civicrm_install();
 }
 
 /**
@@ -35,8 +35,8 @@ function metagroup_civicrm_install() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
  */
-function metagroup_civicrm_postInstall() {
-  _metagroup_civix_civicrm_postInstall();
+function metasearch_civicrm_postInstall() {
+  _metasearch_civix_civicrm_postInstall();
 }
 
 /**
@@ -44,8 +44,8 @@ function metagroup_civicrm_postInstall() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
-function metagroup_civicrm_uninstall() {
-  _metagroup_civix_civicrm_uninstall();
+function metasearch_civicrm_uninstall() {
+  _metasearch_civix_civicrm_uninstall();
 }
 
 /**
@@ -53,8 +53,8 @@ function metagroup_civicrm_uninstall() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
-function metagroup_civicrm_enable() {
-  _metagroup_civix_civicrm_enable();
+function metasearch_civicrm_enable() {
+  _metasearch_civix_civicrm_enable();
 }
 
 /**
@@ -62,8 +62,8 @@ function metagroup_civicrm_enable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  */
-function metagroup_civicrm_disable() {
-  _metagroup_civix_civicrm_disable();
+function metasearch_civicrm_disable() {
+  _metasearch_civix_civicrm_disable();
 }
 
 /**
@@ -71,8 +71,8 @@ function metagroup_civicrm_disable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
-function metagroup_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _metagroup_civix_civicrm_upgrade($op, $queue);
+function metasearch_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  return _metasearch_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -83,8 +83,8 @@ function metagroup_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function metagroup_civicrm_managed(&$entities) {
-  _metagroup_civix_civicrm_managed($entities);
+function metasearch_civicrm_managed(&$entities) {
+  _metasearch_civix_civicrm_managed($entities);
 }
 
 /**
@@ -96,8 +96,8 @@ function metagroup_civicrm_managed(&$entities) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
-function metagroup_civicrm_caseTypes(&$caseTypes) {
-  _metagroup_civix_civicrm_caseTypes($caseTypes);
+function metasearch_civicrm_caseTypes(&$caseTypes) {
+  _metasearch_civix_civicrm_caseTypes($caseTypes);
 }
 
 /**
@@ -110,8 +110,8 @@ function metagroup_civicrm_caseTypes(&$caseTypes) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
  */
-function metagroup_civicrm_angularModules(&$angularModules) {
-  _metagroup_civix_civicrm_angularModules($angularModules);
+function metasearch_civicrm_angularModules(&$angularModules) {
+  _metasearch_civix_civicrm_angularModules($angularModules);
 }
 
 /**
@@ -119,8 +119,8 @@ function metagroup_civicrm_angularModules(&$angularModules) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
-function metagroup_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _metagroup_civix_civicrm_alterSettingsFolders($metaDataFolders);
+function metasearch_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+  _metasearch_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**
@@ -130,8 +130,8 @@ function metagroup_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_entityTypes
  */
-function metagroup_civicrm_entityTypes(&$entityTypes) {
-  _metagroup_civix_civicrm_entityTypes($entityTypes);
+function metasearch_civicrm_entityTypes(&$entityTypes) {
+  _metasearch_civix_civicrm_entityTypes($entityTypes);
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
@@ -141,7 +141,7 @@ function metagroup_civicrm_entityTypes(&$entityTypes) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
  *
-function metagroup_civicrm_preProcess($formName, &$form) {
+function metasearch_civicrm_preProcess($formName, &$form) {
 
 } // */
 
@@ -150,8 +150,8 @@ function metagroup_civicrm_preProcess($formName, &$form) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
  *
-function metagroup_civicrm_navigationMenu(&$menu) {
-  _metagroup_civix_insert_navigation_menu($menu, 'Mailings', array(
+function metasearch_civicrm_navigationMenu(&$menu) {
+  _metasearch_civix_insert_navigation_menu($menu, 'Mailings', array(
     'label' => E::ts('New subliminal message'),
     'name' => 'mailing_subliminal_message',
     'url' => 'civicrm/mailing/subliminal',
@@ -159,5 +159,5 @@ function metagroup_civicrm_navigationMenu(&$menu) {
     'operator' => 'OR',
     'separator' => 0,
   ));
-  _metagroup_civix_navigationMenu($menu);
+  _metasearch_civix_navigationMenu($menu);
 } // */
