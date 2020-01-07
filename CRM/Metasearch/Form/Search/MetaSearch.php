@@ -1,5 +1,6 @@
 <?php
 use CRM_Metasearch_ExtensionUtil as E;
+use KenSh\MetabaseApi\Factory as MetabaseFactory;
 
 /**
  * A custom contact search
@@ -108,6 +109,13 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
    */
   function where($includeContactIDs = FALSE) {
     $question = CRM_Utils_Array::value('question', $this->_formValues);
+    $metabase = MetabaseFactory::create(
+      CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_url'),
+      CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_user'),
+      CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_password')
+    );
+    $promises = [ $metabase->card()->queryAsync($question) ];
+    $results = GuzzleHttp\Promise\settle($promises)->wait();
 
     $params = array();
     $where = "contact_a.id IN (42)";

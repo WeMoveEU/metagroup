@@ -1,0 +1,11 @@
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/kevcomparadise/metabase-api-consumer"
+    }
+  ],
+  "require": {
+    "kschnekenburger/metabase-api-consumer-php": "dev-develop"
+  }
+}

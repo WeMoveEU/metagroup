@@ -1,6 +1,7 @@
 <?php
 
 require_once 'metasearch.civix.php';
+require_once __DIR__ . '/vendor/autoload.php';
 use CRM_Metasearch_ExtensionUtil as E;
 
 /**
