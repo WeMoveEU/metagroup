@@ -19,7 +19,7 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
   function buildForm(&$form) {
     CRM_Utils_System::setTitle(E::ts("Metabase search"));
 
-    $form->add('text', 'question', E::ts("Metabase question ID or URL"), TRUE);
+    $form->add('text', 'question', E::ts("Metabase question ID"), TRUE);
 
     /**
      * if you are using the standard template, this array tells the template what elements
@@ -109,16 +109,24 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
    */
   function where($includeContactIDs = FALSE) {
     $question = CRM_Utils_Array::value('question', $this->_formValues);
+
     $metabase = MetabaseFactory::create(
       CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_url'),
       CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_user'),
       CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_password')
     );
-    $promises = [ $metabase->card()->queryAsync($question) ];
-    $results = GuzzleHttp\Promise\settle($promises)->wait();
 
-    $params = array();
-    $where = "contact_a.id IN (42)";
+    // this metabase lib only has a async method for querying a card
+    $response = $metabase->card()->queryAsync($question)->wait();
+    $json_result = json_decode($response->getBody()->getContents(), TRUE);
+    if (count($json_result) > 0 && count($json_result[0]) != 1) {
+      throw new Exception("The metabase question returned more than one column");
+    }
+
+    $contact_ids = array_map(function($r) { return array_values($r)[0]; }, $json_result);
+    $contact_ids = array_filter($contact_ids, is_integer);
+    $params = [];
+    $where = "contact_a.id IN (" . implode(',', $contact_ids) . ")";
 
     return $this->whereClause($where, $params);
   }
