@@ -122,6 +122,8 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
     if (count($json_result) > 0 && count($json_result[0]) != 1) {
       throw new Exception("The metabase question returned more than one column");
     }
+    // Free memory of the response string
+    unset($response);
 
     $contact_ids = array_map(function($r) { return array_values($r)[0]; }, $json_result);
     $contact_ids = array_filter($contact_ids, is_integer);
