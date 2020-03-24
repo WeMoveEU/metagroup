@@ -19,7 +19,7 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
   function buildForm(&$form) {
     CRM_Utils_System::setTitle(E::ts("Metabase search"));
 
-    $form->add('text', 'question', E::ts("Metabase question ID"), TRUE);
+    $form->add('text', 'question', E::ts("Metabase question URL"), TRUE);
 
     /**
      * if you are using the standard template, this array tells the template what elements
@@ -108,7 +108,13 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
    * @return string, sql fragment with conditional expressions
    */
   function where($includeContactIDs = FALSE) {
-    $question = CRM_Utils_Array::value('question', $this->_formValues);
+    $question_url = parse_url(CRM_Utils_Array::value('question', $this->_formValues));
+    $matches = array();
+    if (!preg_match("/\/question\/([0-9]+)/", $question_url['path'], $matches)) {
+      throw new Exception("You did not provide a valid URL of a Metabase question");
+    }
+    $question['card_id'] = $matches[1];
+    parse_str($question_url['query'], $question_params);
 
     $metabase = MetabaseFactory::create(
       CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_url'),
@@ -116,8 +122,23 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
       CRM_Core_BAO_Setting::getItem('Metasearch settings', 'metabase_password')
     );
 
-    // this metabase lib only has a async method for querying a card
-    $response = $metabase->card()->queryAsync($question)->wait();
+    if (!empty($question_params)) {
+      //First get the card metadata to find out the parameters
+      $card = $metabase->card()->get($question['card_id'])->value();
+      if ($card->dataset_query->type == 'native') {
+        $template_tags = $card->dataset_query->native->{"template-tags"};
+        foreach ($question_params as $qparam => $val) {
+          $tag = $template_tags->{$qparam};
+          $api_param['type'] = $tag->{"widget-type"};
+          $api_param['target'] = [ $tag->type, ['template-tag', $qparam] ];
+          $api_param['value'] = $val;
+          $question['params'][] = $api_param;
+        }
+      }
+    }
+
+    // this metabase "lib" only has a async method for querying a card...
+    $response = $metabase->card()->queryAsync($question['card_id'], $question['params'])->wait();
     $json_result = json_decode($response->getBody()->getContents(), TRUE);
     if (count($json_result) > 0 && count($json_result[0]) != 1) {
       throw new Exception("The metabase question returned more than one column");
