@@ -11,114 +11,72 @@ use Psr\SimpleCache\CacheInterface;
 
 class AuthMiddleware
 {
-    /**
-     * @var string@
-     */
     private $user;
-
-    /**
-     * @var string
-     */
     private $password;
-
-    /**
-     * @var Client
-     */
     private $client;
-
-    /**
-     * @var CacheInterface
-     */
     private $cache;
+    private $nexthandler;
 
-    /**
-     * AuthMiddleware constructor.
-     * @param string $baseUri
-     * @param string $user
-     * @param string $password
-     * @param CacheInterface $cache
-     */
-    public function __construct(string $baseUri, string $user, string $password, CacheInterface $cache)
+    public static function create(string $baseUri, string $user, string $password, CacheInterface $cache) {
+        return function(callable $handler) use ($baseUri, $user, $password, $cache) {
+            return new AuthMiddleware($handler, $baseUri, $user, $password, $cache);
+        };
+    }
+
+    public function __construct(callable $nexthandler, string $baseUri, string $user, string $password, CacheInterface $cache)
     {
         $this->user = $user;
         $this->password = $password;
         $this->client = new Client(['base_uri' => $baseUri]);
         $this->cache = $cache;
+        $this->nexthandler = $nexthandler;
+        $this->retried = FALSE;
     }
 
-    /**
-     * @param callable $handler
-     * @return Closure
-     */
-    public function __invoke(callable $handler)
-    {
-        $fetchSessionTokenID = $this->fetchSessionTokenID();
-        $client = $this->client;
-        $cache = $this->cache;
+    public function __invoke(RequestInterface $request, array $options) {
+        if (!$this->cache->has('metabase_session_token_id')) {
+            $this->resetSessionTokenID();
+        }
 
-        return function (
-            RequestInterface $request,
-            array $options
-        ) use ($handler, $fetchSessionTokenID, $client, $cache) {
-
-            if (!$cache->has('metabase_session_token_id')) {
-                /**
-                 * @var $responseSessionTokenID ResponseInterface
-                 */
-                $responseSessionTokenID = $fetchSessionTokenID($client);
-
-                if ($responseSessionTokenID->getStatusCode() > 200) {
-                    throw new AuthFailedException();
+        $fn = $this->nexthandler;
+        $promise = $fn($request->withHeader('X-Metabase-Session', $this->cache->get('metabase_session_token_id')), $options);
+        return $promise->then(
+            function (ResponseInterface $response) use ($request, $options) {
+                // If the request is unauthorized, the token must have expired so we clear it and retry the request
+                if ($response->getStatusCode() == 401 && !$this->retried) {
+                    $this->resetSessionTokenID();
+                    $this->retried = TRUE;
+                    return $this($request, $options);
                 }
-
-                $sessionIDResult = json_decode($responseSessionTokenID->getBody()->getContents());
-                $cache->set('metabase_session_token_id', $sessionIDResult->id);
+                return $response;
             }
-
-            return $handler($request->withHeader(
-                'X-Metabase-Session',
-                $cache->get('metabase_session_token_id')
-            ), $options);
-        };
+        );
     }
 
-    /**
-     * @return callable|__anonymous@1174
-     */
+    public function resetSessionTokenID()
+    {
+        $responseSessionTokenID = $this->fetchSessionTokenID();
+        if ($responseSessionTokenID->getStatusCode() > 200) {
+            throw new AuthFailedException();
+        }
+
+        $sessionIDResult = json_decode($responseSessionTokenID->getBody()->getContents());
+        $this->cache->set('metabase_session_token_id', $sessionIDResult->id);
+        return $sessionIDResult->id;
+    }
+
     public function fetchSessionTokenID()
     {
-        return new class($this->user, $this->password) {
+        $request = new Request(
+            "POST",
+            "api/session",
+            ["Content-Type" => "application/json; charset=utf-8"],
+            json_encode([
+                'username' => $this->user,
+                'password' => $this->password
+            ])
+        );
 
-            /**
-             * @var string
-             */
-            private $p;
-
-            /**
-             * @var string
-             */
-            private $u;
-
-            public function __construct($user, $password)
-            {
-                $this->u = $user;
-                $this->p = $password;
-            }
-
-            public function __invoke(Client $client)
-            {
-                $request = new Request(
-                    "POST",
-                    "api/session",
-                    ["Content-Type" => "application/json; charset=utf-8"],
-                    json_encode([
-                        'username' => $this->u,
-                        'password' => $this->p
-                    ])
-                );
-
-                return $client->send($request);
-            }
-        };
+        return $this->client->send($request);
     }
 }

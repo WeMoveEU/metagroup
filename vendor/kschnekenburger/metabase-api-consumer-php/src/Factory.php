@@ -104,7 +104,7 @@ class Factory
     public function getHandlerStack() : HandlerStack
     {
         $stack = HandlerStack::create();
-        $stack->push(new AuthMiddleware($this->baseApiUri, $this->user, $this->password, $this->cache));
+        $stack->push(AuthMiddleware::create($this->baseApiUri, $this->user, $this->password, $this->cache));
 
         return $stack;
     }
