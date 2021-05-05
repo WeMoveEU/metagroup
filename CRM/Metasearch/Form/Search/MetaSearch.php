@@ -129,8 +129,14 @@ class CRM_Metasearch_Form_Search_MetaSearch extends CRM_Contact_Form_Search_Cust
         $template_tags = $card->dataset_query->native->{"template-tags"};
         foreach ($question_params as $qparam => $val) {
           $tag = $template_tags->{$qparam};
-          $api_param['type'] = $tag->{"widget-type"};
-          $api_param['target'] = [ $tag->type, ['template-tag', $qparam] ];
+          CRM_Core_Error::debug_var('tag', $tag);
+          if ($tag->{"widget-type"}) { // variable of type "dimension" linked to a column
+            $api_param['type'] = $tag->{"widget-type"};
+            $api_param['target'] = [ $tag->type, ['template-tag', $qparam] ];
+          } else { // variable of type number (or text?)
+            $api_param['type'] = "category";
+            $api_param['target'] = [ "variable", ['template-tag', $qparam] ];
+          }
           $api_param['value'] = $val;
           $question['params'][] = $api_param;
         }
