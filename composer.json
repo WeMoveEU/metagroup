@@ -2,7 +2,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/kevcomparadise/metabase-api-consumer"
+      "url": "https://github.com/WeMoveEU/metabase-api-consumer.git"
     }
   ],
   "require": {
